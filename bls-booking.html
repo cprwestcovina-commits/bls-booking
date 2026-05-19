@@ -6,6 +6,14 @@
 <title>BLS Certification Booking</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-CZ4Y22LGMY"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-CZ4Y22LGMY');
+  gtag('config', 'AW-17617840605');
+</script>
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -26,14 +34,17 @@
     --radius-sm: 8px;
   }
 
-  body {
+  html, body {
     font-family: 'DM Sans', sans-serif;
-    background: var(--gray-100);
-    min-height: 100vh;
+    background: transparent;
+    margin: 0;
+    padding: 0;
+  }
+
+  body {
     display: flex;
-    align-items: center;
     justify-content: center;
-    padding: 2rem 1rem;
+    padding: 0;
   }
 
   .widget {
@@ -42,14 +53,21 @@
     max-width: 520px;
     width: 100%;
     overflow: hidden;
-    box-shadow: 0 4px 40px rgba(0,0,0,0.10);
+    box-shadow: 0 4px 40px rgba(0,0,0,0.08);
   }
 
   .widget-header {
     background: var(--red);
-    padding: 2rem 2rem 1.75rem;
+    padding: 1.1rem 2rem;
     position: relative;
     overflow: hidden;
+  }
+  .header-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 22px;
+    color: var(--white);
+    line-height: 1.2;
+    text-align: center;
   }
   .widget-header::before {
     content: '';
@@ -379,6 +397,43 @@
     color: var(--gray-500);
   }
   .widget-footer svg { width: 13px; height: 13px; }
+
+  .promo-banner {
+    background: #FFF5E6;
+    border-bottom: 1px solid #F5D9A8;
+    padding: 10px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    font-size: 13px;
+    color: #8A5A00;
+    flex-wrap: wrap;
+  }
+  .promo-banner strong { color: #5C3D00; }
+  .promo-code-pill {
+    background: white;
+    border: 1px dashed #C99848;
+    padding: 3px 10px;
+    border-radius: 6px;
+    font-family: 'DM Sans', monospace;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    color: #5C3D00;
+    font-size: 12px;
+  }
+  .promo-copy-btn {
+    background: none;
+    border: none;
+    color: #8A5A00;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    cursor: pointer;
+    padding: 3px 6px;
+  }
+  .promo-copy-btn:hover { color: #5C3D00; }
 </style>
 </head>
 <body>
@@ -386,13 +441,13 @@
 <div class="widget">
 
   <div class="widget-header">
-    <div class="header-eyebrow">American Heart Association</div>
-    <div class="header-title">BLS Certification<br>Class Booking</div>
-    <div class="header-sub">Hands-on CPR &amp; AED training · 4-hour class</div>
-    <div class="header-badge">
-      <div class="pulse"></div>
-      Classes available this month
-    </div>
+    <div class="header-title">BLS Certification Schedule</div>
+  </div>
+
+  <div class="promo-banner">
+    <span>💰 <strong>Save $10</strong> with code</span>
+    <span class="promo-code-pill">HEALTHCARE10</span>
+    <button type="button" class="promo-copy-btn" onclick="copyPromo(this)">Copy</button>
   </div>
 
   <div class="steps-bar" id="stepsBar">
@@ -613,6 +668,7 @@ function buildDates() {
         card.classList.add('selected');
         selectedDate = day;
         document.getElementById('btn1').disabled = false;
+        trackEvent('bls_date_selected', { date: dateKey(day) });
       });
     }
     grid.appendChild(card);
@@ -651,6 +707,7 @@ function buildTimes() {
         btn.classList.add('selected');
         selectedTime = t;
         document.getElementById('btn2').disabled = false;
+        trackEvent('bls_time_selected', { time: t.label });
       });
     }
     grid.appendChild(btn);
@@ -720,8 +777,29 @@ function initiatePayment() {
     body: JSON.stringify(booking),
   }).catch(() => {});
 
+  trackEvent('bls_pay_clicked', {
+    value: CONFIG.price,
+    currency: CONFIG.currency,
+    date: booking.date,
+    time: booking.time_label,
+  });
+
   window.open(CONFIG.squarePaymentUrl, '_blank');
   document.getElementById('postPayNote').style.display = 'block';
+}
+
+function trackEvent(name, params) {
+  try {
+    if (typeof gtag === 'function') gtag('event', name, params || {});
+  } catch (e) {}
+}
+
+function copyPromo(btn) {
+  navigator.clipboard.writeText('HEALTHCARE10').then(() => {
+    const original = btn.textContent;
+    btn.textContent = 'Copied!';
+    setTimeout(() => { btn.textContent = original; }, 1500);
+  });
 }
 
 buildDates();
