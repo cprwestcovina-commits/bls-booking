@@ -735,6 +735,18 @@ function trackEvent(name, params) {
   } catch (e) {}
 }
 
+function postHeightToParent() {
+  if (window.parent === window) return;
+  const h = document.querySelector('.widget').getBoundingClientRect().height;
+  window.parent.postMessage({ type: 'bls-widget-resize', height: Math.ceil(h) }, '*');
+}
+
+if (window.ResizeObserver) {
+  const ro = new ResizeObserver(() => postHeightToParent());
+  ro.observe(document.querySelector('.widget'));
+}
+window.addEventListener('load', postHeightToParent);
+
 function copyPromo(btn) {
   navigator.clipboard.writeText('HEALTHCARE10').then(() => {
     const original = btn.textContent;
