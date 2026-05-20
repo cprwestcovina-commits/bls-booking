@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>BLS Certification Booking</title>
+<title>BLS Renewal Booking</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-CZ4Y22LGMY"></script>
@@ -431,13 +431,13 @@
 <div class="widget">
 
   <div class="widget-header">
-    <div class="header-title">BLS Certification Schedule</div>
+    <div class="header-title">BLS Renewal Schedule</div>
     <div class="header-sub">📍 100 Barranca St #255-B, West Covina</div>
   </div>
 
   <div class="promo-banner">
-    <span>💰 <strong>Save $10</strong> with code</span>
-    <span class="promo-code-pill">HEALTHCARE10</span>
+    <span>💰 <strong>Save $25</strong> with code</span>
+    <span class="promo-code-pill">RENEWAL25</span>
     <button type="button" class="promo-copy-btn" onclick="copyPromo(this)">Copy</button>
   </div>
 
@@ -530,7 +530,7 @@
       <div class="summary-box">
         <div class="summary-row">
           <span class="label">Course</span>
-          <span class="val">BLS Certification</span>
+          <span class="val">BLS Renewal</span>
         </div>
         <div class="summary-row">
           <span class="label">Location</span>
@@ -581,7 +581,7 @@ const CONFIG = {
   price: 89.00,
   currency: 'USD',
   squarePaymentUrl: 'https://square.link/u/1OV7zGhW',
-  makeWebhookUrl: 'https://hook.us2.make.com/cuw7w3u2o2r2vtumh9x9gog7dxi0b8f9',
+  makeWebhookUrl: 'https://hook.us2.make.com/o2kwxhf1dx7ie4tcs7wz0od2i17e3x51',
   weekdayTimes: [
     { id: 'am', label: '10:00 AM', end: '12:00 PM', seats: 12 },
     { id: 'pm', label: '6:00 PM', end: '8:00 PM', seats: 12 },
@@ -672,7 +672,7 @@ function buildDates() {
         card.classList.add('selected');
         selectedDate = day;
         document.getElementById('btn1').disabled = false;
-        trackEvent('bls_date_selected', { date: dateKey(day) });
+        trackEvent('renewal_date_selected', { date: dateKey(day) });
       });
     }
     grid.appendChild(card);
@@ -709,7 +709,7 @@ function buildTimes() {
         btn.classList.add('selected');
         selectedTime = t;
         document.getElementById('btn2').disabled = false;
-        trackEvent('bls_time_selected', { time: t.label });
+        trackEvent('renewal_time_selected', { time: t.label });
       });
     }
     grid.appendChild(btn);
@@ -768,10 +768,10 @@ function initiatePayment() {
   const email = document.getElementById('email').value.trim();
   const phone = document.getElementById('phone').value.trim();
 
-  const booking_id = 'bls-' + Date.now() + '-' + Math.random().toString(36).slice(2, 8);
+  const booking_id = 'rnw-' + Date.now() + '-' + Math.random().toString(36).slice(2, 8);
   const booking = {
-    ref: 'bls-booking',
-    course_type: 'bls',
+    ref: 'bls-renewal',
+    course_type: 'renewal',
     booking_id: booking_id,
     date: dateKey(selectedDate),
     date_formatted: formatDate(selectedDate),
@@ -817,12 +817,12 @@ function initiatePayment() {
       booking_id: booking_id,
       submitted_at: booking.submitted_at,
       status: 'pending',
-      course_type: 'bls',
+      course_type: 'renewal',
       square_payment_id: '',
     }),
   }).catch(() => {});
 
-  trackEvent('bls_pay_clicked', {
+  trackEvent('renewal_pay_clicked', {
     value: CONFIG.price,
     currency: CONFIG.currency,
     date: booking.date,
@@ -842,7 +842,7 @@ function trackEvent(name, params) {
 function postHeightToParent() {
   if (window.parent === window) return;
   const h = document.querySelector('.widget').getBoundingClientRect().height;
-  window.parent.postMessage({ type: 'bls-widget-resize', height: Math.ceil(h) }, '*');
+  window.parent.postMessage({ type: 'renewal-widget-resize', height: Math.ceil(h) }, '*');
 }
 
 if (window.ResizeObserver) {
@@ -852,7 +852,7 @@ if (window.ResizeObserver) {
 window.addEventListener('load', postHeightToParent);
 
 function copyPromo(btn) {
-  navigator.clipboard.writeText('HEALTHCARE10').then(() => {
+  navigator.clipboard.writeText('RENEWAL25').then(() => {
     const original = btn.textContent;
     btn.textContent = 'Copied!';
     setTimeout(() => { btn.textContent = original; }, 1500);
