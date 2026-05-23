@@ -815,6 +815,14 @@ function initiatePayment() {
     landing_url: trackLandingUrl,
   };
 
+  // Dedup: if same email+course was submitted < 10 min ago, skip notifications
+  // (still opens Square so customer can complete payment)
+  const dedupeKey = 'cprwc_submit_' + (email||'').toLowerCase().trim() + '_' + (booking.course_type||'');
+  const lastSubmit = parseInt(localStorage.getItem(dedupeKey) || '0', 10);
+  const isDuplicate = (Date.now() - lastSubmit) < 10 * 60 * 1000;
+  localStorage.setItem(dedupeKey, String(Date.now()));
+
+  if (!isDuplicate) {
   // Fire to Make.com webhook (sends nudge email + admin alert)
   fetch(CONFIG.makeWebhookUrl, {
     method: 'POST',
@@ -854,6 +862,7 @@ function initiatePayment() {
       landing_url: trackLandingUrl,
     }),
   }).catch(() => {});
+  } // end dedup guard
 
   trackEvent('bls_pay_clicked', {
     value: CONFIG.price,
